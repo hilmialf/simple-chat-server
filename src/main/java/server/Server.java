@@ -15,10 +15,11 @@ public class Server {
             Socket clientSocket = serverSocket.accept();
             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
             BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
         ){
+            System.out.println("client connected " + clientSocket.getInetAddress() + ":" + clientSocket.getPort());
             String message;
-            while((message = in.readLine()) != null){
-                System.out.println(message);
+            while((message = stdIn.readLine()) != null){
                 out.println(message);
                 if("quit".equals(message)){
                     System.out.println("Disconnecting client..." + clientSocket.getPort());
