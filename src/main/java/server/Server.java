@@ -6,30 +6,47 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Server {
-    static int port;
+    private int port;
+    private final MultiQueue<String> multiQueue =  new MultiQueue<>();
+    public Server(){
+        this(8000);
+    }
+    public Server(int port){
+        this.port = port;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
     public static void main(String[] args) {
-        port = args.length == 0 ? 8000 : Integer.parseInt(args[0]);
-        try(ServerSocket serverSocket = new ServerSocket(port);
-            Socket clientSocket = serverSocket.accept();
-            PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-            BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
-        ){
-            System.out.println("client connected " + clientSocket.getInetAddress() + ":" + clientSocket.getPort());
-            String message;
-            while((message = stdIn.readLine()) != null){
-                out.println(message);
-                if("quit".equals(message)){
-                    System.out.println("Disconnecting client..." + clientSocket.getPort());
-                    System.out.println("Terminating program...");
-                    break;
-                }
+        Server server = args.length == 0 ? new Server() : new Server(Integer.parseInt(args[0]));
+        System.out.println("Running server in port " + server.getPort());
+        server.run();
+    }
+
+    public void run(){
+        try(ServerSocket serverSocket = new ServerSocket(port)){
+            // Main loop thread to accept incoming connection only.
+            // The handling is done in different threads.
+            Map<String,ClientHandler> clientMap = new HashMap<>();
+            Socket clientSocket;
+            ClientHandler clientHandler;
+            while(true){
+                clientSocket = serverSocket.accept();
+                clientHandler = new ClientHandler(clientSocket, multiQueue);
+                clientMap.put(clientHandler.getNickname(), clientHandler);
+                multiQueue.put("client connected " + clientSocket.getInetAddress() + ":" + clientSocket.getPort());
+                clientHandler.run();
             }
         } catch (IOException e){
             System.out.println(e.getMessage());
         }
-
     }
 }
