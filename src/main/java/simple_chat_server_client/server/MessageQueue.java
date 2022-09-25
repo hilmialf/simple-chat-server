@@ -1,4 +1,4 @@
-package server;
+package simple_chat_server_client.server;
 
 public interface MessageQueue<T>{
     /**

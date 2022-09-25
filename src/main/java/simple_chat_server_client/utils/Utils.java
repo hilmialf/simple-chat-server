@@ -1,4 +1,4 @@
-package utils;
+package simple_chat_server_client.utils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

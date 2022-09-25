@@ -1,4 +1,4 @@
-package learning;
+package simple_chat_server_client.learning;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

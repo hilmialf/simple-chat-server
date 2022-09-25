@@ -1,4 +1,4 @@
-package server;
+package simple_chat_server_client.server;
 
 import java.util.HashSet;
 import java.util.Set;

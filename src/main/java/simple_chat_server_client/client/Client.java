@@ -1,4 +1,4 @@
-package client;
+package simple_chat_server_client.client;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -6,12 +6,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.net.Socket;
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
-import utils.Utils;
+import simple_chat_server_client.utils.Utils;
 
 public class Client {
     public static void main(String[] args) {

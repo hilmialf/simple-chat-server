@@ -1,4 +1,4 @@
-package server;
+package simple_chat_server_client.server;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -8,7 +8,7 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.Random;
 
-import utils.Utils;
+import simple_chat_server_client.utils.Utils;
 
 public class ClientHandler{
     static final Random random = new Random();
