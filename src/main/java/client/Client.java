@@ -1,12 +1,17 @@
 package client;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+
+import utils.Utils;
 
 public class Client {
     public static void main(String[] args) {
@@ -15,11 +20,11 @@ public class Client {
             Thread toServerThread = new Thread(()->{
                 try(
                         BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
-                        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+                        OutputStream out = socket.getOutputStream();
                 ){
                     String messageToSend;
                     while((messageToSend = stdIn.readLine()) != null){
-                        out.println(messageToSend);
+                        Utils.sendMessage(out, messageToSend.getBytes(StandardCharsets.UTF_8));
                     }
                 } catch (IOException e){
                     e.printStackTrace();
@@ -28,10 +33,11 @@ public class Client {
             });
 
             Thread fromServerThread = new Thread(() -> {
-                try(BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));){
-                    String messageFromServer;
-                    while((messageFromServer = in.readLine()) != null){
-                        System.out.println(messageFromServer);
+                try(InputStream in = socket.getInputStream()){
+                    ByteArrayOutputStream out;
+                    while(true){
+                        out = Utils.readFromInputStream(in);
+                        System.out.println(out.toString());
                     }
                 } catch (IOException e){
                     e.printStackTrace();
@@ -50,4 +56,6 @@ public class Client {
             e.printStackTrace();
         }
     }
+
+
 }

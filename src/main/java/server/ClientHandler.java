@@ -1,11 +1,14 @@
 package server;
 
-import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.Random;
+
+import utils.Utils;
 
 public class ClientHandler{
     static final Random random = new Random();
@@ -22,12 +25,12 @@ public class ClientHandler{
     }
     public void run(){
         Thread toClientThread = new Thread(()->{
-            try(PrintWriter out = new PrintWriter(socket.getOutputStream(), true);){
+            try(OutputStream out = socket.getOutputStream()){
                 String toBeSend;
                 while(true){
                     toBeSend = clientMessages.take();
                     System.out.println(this.nickname + " " + toBeSend);
-                    out.println(toBeSend);
+                    Utils.sendMessage(out, toBeSend.getBytes(StandardCharsets.UTF_8));
                 }
             }catch (IOException e){
                 this.disconnect();
@@ -36,10 +39,11 @@ public class ClientHandler{
         });
 
         Thread fromClientThread = new Thread(()->{
-            try(BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))){
-                String msg;
-                while((msg = in.readLine()) != null){
-                    this.multiQueue.put(msg);
+            try(InputStream in = socket.getInputStream()){
+                ByteArrayOutputStream out;
+                while(true){
+                    out = Utils.readFromInputStream(in);
+                    this.multiQueue.put(out.toString());
                 }
             }catch (IOException e){
                 this.disconnect();
@@ -52,6 +56,8 @@ public class ClientHandler{
         toClientThread.start();
         fromClientThread.start();
     }
+
+
 
     public String getNickname() {
         return nickname;
